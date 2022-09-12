@@ -31,6 +31,8 @@ RUN apk add \
     zlib-static \
     libunwind-dev \
     libunwind-static \
+    libevent-dev \
+    libevent-static \
     tzdata
 
 RUN update-ca-certificates

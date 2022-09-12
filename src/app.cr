@@ -38,38 +38,47 @@ end
 Signal::INT.trap &terminate
 Signal::TERM.trap &terminate
 
-var = nil
+exit_channel = Channel(Exception?).new
 
-if run_error_test
-  puts "running exception test:"
-  loop do
-    caught = false
-    begin
-      print "!"
-      raise "some error" if run_error_test
-      puts "FAILED TO RAISE"
-      break
-    rescue error
-      var = error.inspect_with_backtrace
-      caught = true
-    end
+spawn do
+  last_error = nil
 
-    if caught
-      print "."
-    else
-      puts "NOT RESCUED"
-      break
-    end
+  if run_error_test
+    puts "running exception test:"
+    loop do
+      caught = false
+      begin
+        print "!"
+        raise "example error" if run_error_test
+        puts "FAILED TO RAISE"
+        break
+      rescue error
+        last_error = error
+        caught = true
+      end
 
-    # want to ensure the compiler doesn't optimise away anything
-    run_count -= 1
-    if run_count == 0 || exit_requested
-      run_error_test = false
-      break
+      if caught
+        print "."
+      else
+        puts "NOT RESCUED"
+        break
+      end
+
+      # want to ensure the compiler doesn't optimise away anything
+      run_count -= 1
+      if run_count == 0 || exit_requested
+        run_error_test = false
+        break
+      end
+      sleep sleep_time
     end
-    sleep sleep_time
   end
+
+  exit_channel.send last_error
 end
+
+exited_with = exit_channel.receive
 
 puts ""
 puts "test terminated"
+puts "last error was: #{exited_with.try &.inspect_with_backtrace}"
