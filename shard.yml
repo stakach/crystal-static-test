@@ -1,0 +1,6 @@
+name: crystal-staic-test
+version: 1.0.0
+
+targets:
+  static:
+    main: src/app.cr
