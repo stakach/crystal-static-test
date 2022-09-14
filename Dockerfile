@@ -33,6 +33,10 @@ RUN apk add \
     libunwind-static \
     libevent-dev \
     libevent-static \
+    libssh2-dev \
+    libssh2-static \
+    lz4-dev \
+    lz4-static \
     tzdata
 
 RUN update-ca-certificates
@@ -90,4 +94,4 @@ USER appuser:appuser
 # Run the app binding on port 3000
 EXPOSE 3000
 ENTRYPOINT ["/static"]
-CMD ["/static", "-e"]
+CMD ["/static", "-e", "-c", "5"]
